@@ -2,24 +2,29 @@
 
 import sys
 import rpyc
-from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
+from flask import Flask
+from flask_sockets import Sockets
+
 
 conn = rpyc.classic.connect(sys.argv[1])
 ev3 = conn.modules['ev3dev.ev3']
 motor_turn = ev3.LargeMotor('outA')
 motor_forward = ev3.MediumMotor('outD')
 
+app = Flask(__name__)
+sockets = Sockets(app)
 
-class SimpleEcho(WebSocket):
 
-    def handleMessage(self):
-        # echo message back to client
-
+@sockets.route('/')
+def echo_socket(ws):
+    print('connected')
+    while not ws.closed:
+        data = ws.receive()
         current_axes = {
-            "UP": self.data in ('38', '119'),
-            "DOWN": self.data in ('40', '115'),
-            "LEFT": self.data in ('37', '97'),
-            "RIGHT": self.data in ('39', '100'),
+            "UP": data in ('38', '119'),
+            "DOWN": data in ('40', '115'),
+            "LEFT": data in ('37', '97'),
+            "RIGHT": data in ('39', '100'),
         }
 
         if current_axes["UP"]:
@@ -31,15 +36,11 @@ class SimpleEcho(WebSocket):
             motor_turn.run_timed(time_sp=100, speed_sp=60)
         elif current_axes["LEFT"]:
             motor_turn.run_timed(time_sp=100, speed_sp=-60)
-
-        self.sendMessage(self.data)
-
-    def handleConnected(self):
-        print(self.address, 'connected')
-
-    def handleClose(self):
-        print(self.address, 'closed')
+    print('closed')
 
 
-if __name__ == '__main__':
-    SimpleWebSocketServer('', 8001, SimpleEcho).serveforever()
+if __name__ == "__main__":
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    server = pywsgi.WSGIServer(('', 8001), app, handler_class=WebSocketHandler)
+    server.serve_forever()
