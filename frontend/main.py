@@ -26,10 +26,15 @@ img{
 <script>
 var connection = new WebSocket('ws://85.89.184.221:8001');
 
-document.addEventListener("keypress",
-//$(document).keypress(
+document.addEventListener("keyup",
     function(e){ // pressing key
-        connection.send(e.keyCode || e.which );
+        connection.send("up " + e.keyCode || e.which );
+    }
+);
+
+document.addEventListener("keydown",
+    function(e){ // pressing key
+        connection.send("down " + e.keyCode || e.which );
     }
 );
 

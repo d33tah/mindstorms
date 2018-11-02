@@ -18,24 +18,33 @@ sockets = Sockets(app)
 @sockets.route('/')
 def echo_socket(ws):
     print('connected')
+    last_msg = ''
     while not ws.closed:
         data = ws.receive()
+        if data == last_msg:
+            continue
+        else:
+            last_msg = data
+        print(data)
+        direction, key = data.split()
         current_axes = {
-            "UP": data in ('38', '119'),
-            "DOWN": data in ('40', '115'),
-            "LEFT": data in ('37', '97'),
-            "RIGHT": data in ('39', '100'),
+            "UP": key in ('38', '119'),
+            "DOWN": key in ('40', '115'),
+            "LEFT": key in ('37', '97'),
+            "RIGHT": key in ('39', '100'),
         }
 
+        speed = 0 if direction == 'up' else 600
+
         if current_axes["UP"]:
-            motor_forward.run_timed(time_sp=100, speed_sp=600)
+            motor_forward.run_forever(speed_sp=speed)
         elif current_axes["DOWN"]:
-            motor_forward.run_timed(time_sp=100, speed_sp=-600)
+            motor_forward.run_forever(speed_sp=-speed)
 
         if current_axes["RIGHT"]:
-            motor_turn.run_timed(time_sp=100, speed_sp=60)
+            motor_turn.run_forever(speed_sp=speed / 10)
         elif current_axes["LEFT"]:
-            motor_turn.run_timed(time_sp=100, speed_sp=-60)
+            motor_turn.run_forever(speed_sp=-speed / 10)
     print('closed')
 
 
