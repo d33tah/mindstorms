@@ -34,6 +34,15 @@ def echo_socket(ws):
             "RIGHT": key in ('39', '100'),
         }
 
+        if current_axes["RIGHT"] and direction == 'up':
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-20)
+        elif current_axes["RIGHT"]:
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=20)
+        elif current_axes["LEFT"] and direction == 'up':
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-20)
+        elif current_axes["LEFT"]:
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-60)
+
         speed = 0 if direction == 'up' else 600
 
         if current_axes["UP"]:
@@ -41,10 +50,6 @@ def echo_socket(ws):
         elif current_axes["DOWN"]:
             motor_forward.run_forever(speed_sp=-speed)
 
-        if current_axes["RIGHT"]:
-            motor_turn.run_forever(speed_sp=speed / 10)
-        elif current_axes["LEFT"]:
-            motor_turn.run_forever(speed_sp=-speed / 10)
     print('closed')
 
 
