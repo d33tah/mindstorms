@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import io
+import socket
 from PIL import Image
 from PIL import ImageDraw
 
@@ -50,21 +51,31 @@ def append_text(img_b, text):
     return img_b_out
 
 
-def main():
-    fout = open('/dev/stdout', 'wb')
-    with open('/dev/stdin', 'rb') as f:
-
-        fout.write(HTTP_HEADER)
-
-        for img_b in yield_images(f):
-
+def main(images):
+        yield HTTP_HEADER
+        for img_b in images:
             img_b_out = append_text(img_b, "Sample text")
+            yield (b'\r\n--Ba4oTvQMY8ew04N8dcnM\r\n' +
+                   b'Content-Type: image/jpeg\r\n' +
+                   b'Content-Length: %d\r\n\r\n' % len(img_b_out) +
+                   img_b_out)
 
-            fout.write(b'\r\n--Ba4oTvQMY8ew04N8dcnM')
-            fout.write(b'Content-Type: image/jpeg\r\n')
-            fout.write(b'Content-Length: %d\r\n\r\n' % len(img_b_out))
-            fout.write(img_b_out)
+
+def server_thread(images):
+    s = socket.socket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(('0.0.0.0', 5112))
+
+
+    while True:
+        s.listen()
+        sock, address = s.accept()
+        for msg in main(images):
+            sock.send(msg)
 
 
 if __name__ == '__main__':
-    main()
+    fout = open('/dev/stdout', 'wb')
+    with open('/dev/stdin', 'rb') as f:
+        for msg in main(yield_images(f)):
+            fout.write(msg)
