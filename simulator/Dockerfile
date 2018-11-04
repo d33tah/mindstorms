@@ -11,4 +11,4 @@ ADD ./main.py .
 ADD ./mjpeg_server.py .
 
 EXPOSE 5112
-ENTRYPOINT xvfb-run -s '-screen 0 1024x768x24 +extension GLX +render' ./main.py
+ENTRYPOINT xvfb-run -s '-screen 0 640x480x24' ./main.py
