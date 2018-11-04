@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import io
-import sys
 from PIL import Image
 from PIL import ImageDraw
 
@@ -29,32 +28,42 @@ def read_image_size(f):
     return content_length
 
 
+def yield_images(f):
+    while True:
+        # skip boundary:
+        f.read(2)
+        f.readline()
+
+        content_length = read_image_size(f)
+        yield f.read(content_length)
+
+
+def append_text(img_b, text):
+    bio_r = io.BytesIO(img_b)
+    img = Image.open(bio_r)
+    imgd = ImageDraw.Draw(img)
+    imgd.text((0, 0), text, (255, 255, 255))
+
+    bio_w = io.BytesIO()
+    img.save(bio_w, format="JPEG")
+    img_b_out = bio_w.getvalue()
+    return img_b_out
+
+
 def main():
     fout = open('/dev/stdout', 'wb')
     with open('/dev/stdin', 'rb') as f:
 
         fout.write(HTTP_HEADER)
 
-        content_length = None
-        while True:
-            f.read(2)
-            boundary = f.readline()
-            content_length = read_image_size(f)
-            img_b = f.read(content_length)
-            bio_r = io.BytesIO(img_b)
-            img = Image.open(bio_r)
-            imgd = ImageDraw.Draw(img)
-            imgd.text((0, 0), "Sample Text", (255, 255, 255))
+        for img_b in yield_images(f):
 
-            bio_w = io.BytesIO()
-            img.save(bio_w, format="JPEG")
-            img_b_out = bio_w.getvalue()
-            fout.write(b'\r\n' + boundary)
+            img_b_out = append_text(img_b, "Sample text")
+
+            fout.write(b'\r\n--Ba4oTvQMY8ew04N8dcnM')
             fout.write(b'Content-Type: image/jpeg\r\n')
             fout.write(b'Content-Length: %d\r\n\r\n' % len(img_b_out))
             fout.write(img_b_out)
-
-            sys.stderr.write('%s => %s\n' % (content_length, len(img_b_out)))
 
 
 if __name__ == '__main__':
