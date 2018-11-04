@@ -8,13 +8,13 @@ services:
   websockets:
     build: websockets
     environment:
-      - EV3DEV_RPC_HOST=127.0.0.1
+      - EV3DEV_RPC_HOST=10.244.106.37
     ports:
       - 8001:8001
   frontend:
     build: frontend
     environment:
-      - WEBSOCKET_URL=ws://mindstorms_websockets_1:8001
-      - VIDEO_URL=http://localhost:5112
+      - WEBSOCKET_URL=ws://localhost:8001
+      - VIDEO_URL=http://192.168.0.138:8080/video
     ports:
       - 8080:8080

@@ -11,8 +11,8 @@ from flask_sockets import Sockets
 EV3DEV_RPC_HOST = os.environ['EV3DEV_RPC_HOST']
 conn = rpyc.classic.connect(EV3DEV_RPC_HOST)
 ev3 = conn.modules['ev3dev.ev3']
-motor_turn = ev3.LargeMotor('outA')
-motor_forward = ev3.MediumMotor('outD')
+motor_turn = ev3.MediumMotor('outD')
+motor_forward = ev3.LargeMotor('outA')
 
 app = Flask(__name__)
 sockets = Sockets(app)
@@ -46,7 +46,7 @@ def echo_socket(ws):
         elif current_axes["LEFT"]:
             motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-60)
 
-        speed = 0 if direction == 'up' else 600
+        speed = 0 if direction == 'up' else -600
 
         if current_axes["UP"]:
             motor_forward.run_forever(speed_sp=speed)
