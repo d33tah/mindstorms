@@ -38,13 +38,13 @@ def echo_socket(ws):
         }
 
         if current_axes["RIGHT"] and direction == 'up':
-            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-20)
-        elif current_axes["RIGHT"]:
             motor_turn.run_to_abs_pos(speed_sp=200, position_sp=20)
-        elif current_axes["LEFT"] and direction == 'up':
-            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-20)
-        elif current_axes["LEFT"]:
+        elif current_axes["RIGHT"]:
             motor_turn.run_to_abs_pos(speed_sp=200, position_sp=-60)
+        elif current_axes["LEFT"] and direction == 'up':
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=20)
+        elif current_axes["LEFT"]:
+            motor_turn.run_to_abs_pos(speed_sp=200, position_sp=60)
 
         speed = 0 if direction == 'up' else -600
 
