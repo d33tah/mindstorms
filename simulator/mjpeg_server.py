@@ -43,7 +43,7 @@ def append_text(img_b, text):
     bio_r = io.BytesIO(img_b)
     img = Image.open(bio_r)
     imgd = ImageDraw.Draw(img)
-    imgd.text((0, 0), text, (255, 255, 255))
+    imgd.text((0, 0), text, (255, 0, 0))
 
     bio_w = io.BytesIO()
     img.save(bio_w, format="JPEG")
@@ -53,8 +53,10 @@ def append_text(img_b, text):
 
 def main(images):
         yield HTTP_HEADER
+        n = 0
         for img_b in images:
-            img_b_out = append_text(img_b, "Sample text")
+            n += 1
+            img_b_out = append_text(img_b, str(n))
             yield (b'\r\n--Ba4oTvQMY8ew04N8dcnM\r\n' +
                    b'Content-Type: image/jpeg\r\n' +
                    b'Content-Length: %d\r\n\r\n' % len(img_b_out) +
@@ -71,7 +73,10 @@ def server_thread(images, port):
         s.listen()
         sock, address = s.accept()
         for msg in main(images):
-            sock.send(msg)
+            try:
+                sock.send(msg)
+            except (BrokenPipeError, ConnectionResetError):
+                break
 
 
 if __name__ == '__main__':

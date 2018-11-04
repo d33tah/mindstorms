@@ -12,15 +12,26 @@ import threading
 import mjpeg_server
 import queue
 
-q = queue.Queue()
+QUEUE_BUFFER = 1
+
+q = queue.Queue(maxsize=QUEUE_BUFFER)
 
 TRIANGLES = []
 im = 0
 CAMERA_X, CAMERA_Y, CAMERA_Z = (-0.5, 0.5, 0.5)
 
+CLOCK = pygame.time.Clock()
+
+def recode_image(data):
+    width, height = (600, 600)
+    bio = io.BytesIO()
+    PIL.Image.frombytes("RGB", (width, height), data).save(bio, "PNG")
+    return bio.getvalue()
+
+
 def yield_images():
     while True:
-        yield q.get()
+        yield recode_image(q.get())
 
 
 def append_node(x, z, c):
@@ -127,9 +138,10 @@ def setup_textures():
 def save_buffer():
     width, height = (600, 600)
     data = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
-    bio = io.BytesIO()
-    PIL.Image.frombytes("RGB", (width, height), data).save(bio, "PNG")
-    q.put(bio.getvalue())
+    try:
+        q.put_nowait(data)
+    except queue.Full:
+        pass
 
 
 def display():
@@ -163,6 +175,8 @@ def display():
     glEnd()
     glutSwapBuffers()
     save_buffer()
+    CLOCK.tick()
+    # print(CLOCK.get_fps())
 
 
 def initGL():
