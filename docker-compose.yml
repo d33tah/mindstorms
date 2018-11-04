@@ -1,0 +1,20 @@
+version: '3'
+services:
+  simulator:
+    build: simulator
+    ports:
+      - 5112:5112
+    tty: true
+  websockets:
+    build: websockets
+    environment:
+      - EV3DEV_RPC_HOST=127.0.0.1
+    ports:
+      - 8001:8001
+  frontend:
+    build: frontend
+    environment:
+      - WEBSOCKET_URL=ws://mindstorms_websockets_1:8001
+      - VIDEO_URL=http://localhost:5112
+    ports:
+      - 8080:8080

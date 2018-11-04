@@ -2,11 +2,14 @@
 
 import sys
 import rpyc
+import os
+
 from flask import Flask
 from flask_sockets import Sockets
 
 
-conn = rpyc.classic.connect(sys.argv[1])
+EV3DEV_RPC_HOST = os.environ['EV3DEV_RPC_HOST']
+conn = rpyc.classic.connect(EV3DEV_RPC_HOST)
 ev3 = conn.modules['ev3dev.ev3']
 motor_turn = ev3.LargeMotor('outA')
 motor_forward = ev3.MediumMotor('outD')
