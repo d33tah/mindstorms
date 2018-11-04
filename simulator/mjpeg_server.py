@@ -61,10 +61,10 @@ def main(images):
                    img_b_out)
 
 
-def server_thread(images):
+def server_thread(images, port):
     s = socket.socket()
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('0.0.0.0', 5112))
+    s.bind(('0.0.0.0', port))
 
 
     while True:

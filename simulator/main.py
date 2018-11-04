@@ -179,7 +179,7 @@ def initGL():
 def main():
 
     threading.Thread(target=mjpeg_server.server_thread,
-                     args=(yield_images(),)).start()
+                     args=(yield_images(), 5112)).start()
 
     load_maze()
     glutInit(sys.argv)
