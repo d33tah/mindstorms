@@ -4,9 +4,9 @@ mindstorms
 This is a repository where I've gathered code from my experiments with Lego
 Mindstorms. Here's what I ultimately wanted to achieve:
 
-1. ~~User visits a webpage,
-2. The webpage contains video from a robot (streamed from an Android IP Webcam),
-3. Webpage allows the user to control the robot using~~:
+1. ~~User visits a webpage,~~
+2. ~~The webpage contains video from a robot (streamed from an Android IP Webcam),~~
+3. ~~Webpage allows the user to control the robot using:~~
 
 - [x] keyboard,
 - [ ] mouse,
