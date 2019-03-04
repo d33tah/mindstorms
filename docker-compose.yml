@@ -8,13 +8,14 @@ services:
   websockets:
     build: websockets
     environment:
-      - EV3DEV_RPC_HOST=10.244.106.37
+      - EV3DEV_RPC_HOST=10.42.0.3
     ports:
       - 8001:8001
   frontend:
     build: frontend
     environment:
       - WEBSOCKET_URL=ws://localhost:8001
-      - VIDEO_URL=http://192.168.0.138:8080/video
     ports:
       - 8080:8080
+    depends_on:
+      - websockets
